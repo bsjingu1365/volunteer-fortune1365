@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#2563eb" />
+  <title>AI 봉사운 뽑기</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+      background: linear-gradient(145deg, #eff6ff, #f0fdf4);
+      color: #172033;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 22px;
+    }
+    .wrap { width: 100%; max-width: 470px; }
+    .card {
+      background: rgba(255,255,255,.96);
+      border-radius: 26px;
+      padding: 28px 22px;
+      box-shadow: 0 18px 50px rgba(40,70,120,.14);
+      border: 1px solid rgba(255,255,255,.9);
+    }
+    .badge {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #e8f0ff;
+      color: #2451ad;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    h1 { font-size: 30px; margin: 5px 0 8px; letter-spacing: -1.2px; }
+    .subtitle { margin: 0 0 22px; color: #667085; line-height: 1.55; }
+    label { display: block; margin: 15px 0 7px; font-weight: 800; font-size: 14px; }
+    input, select {
+      width: 100%;
+      height: 52px;
+      padding: 0 15px;
+      border: 1px solid #d8dfeb;
+      border-radius: 14px;
+      font-size: 16px;
+      background: #fff;
+      outline: none;
+    }
+    input:focus, select:focus { border-color: #4f7ddd; box-shadow: 0 0 0 4px #eaf0ff; }
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 15px;
+      padding: 16px 18px;
+      margin-top: 20px;
+      background: linear-gradient(135deg, #2f67d8, #327d68);
+      color: white;
+      font-size: 17px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(47,103,216,.22);
+    }
+    button:active { transform: translateY(1px); }
+    #result { display: none; }
+    .score {
+      width: 126px;
+      height: 126px;
+      margin: 12px auto 18px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: conic-gradient(#3478e5 0deg, #55ad8a 290deg, #e9eef7 290deg);
+      position: relative;
+    }
+    .score::after {
+      content: "";
+      position: absolute;
+      width: 102px;
+      height: 102px;
+      background: white;
+      border-radius: 50%;
+    }
+    .score span { position: relative; z-index: 1; font-size: 29px; font-weight: 950; }
+    .result-title { text-align: center; margin-bottom: 3px; }
+    .result-sub { text-align: center; color: #667085; margin-top: 0; }
+    .item {
+      background: #f7f9fc;
+      border: 1px solid #e7ebf2;
+      border-radius: 16px;
+      padding: 15px;
+      margin-top: 10px;
+    }
+    .item b { display: block; margin-bottom: 5px; color: #30405d; }
+    .message {
+      padding: 18px;
+      margin-top: 13px;
+      border-radius: 17px;
+      background: #eef8f3;
+      color: #245b48;
+      line-height: 1.65;
+      font-weight: 750;
+      text-align: center;
+    }
+    .notice {
+      margin-top: 14px;
+      padding: 13px;
+      border-radius: 14px;
+      background: #fff7e6;
+      color: #7a5715;
+      font-size: 14px;
+      text-align: center;
+      font-weight: 750;
+    }
+    .small { text-align: center; color: #8b95a7; font-size: 12px; margin: 16px 0 0; }
+    .again { background: #172033; box-shadow: none; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card" id="start">
+      <div class="badge">부산진구자원봉사센터</div>
+      <h1>🤖 AI 봉사운 뽑기</h1>
+      <p class="subtitle">간단한 정보를 입력하면 오늘의 봉사운과 작은 실천 미션을 알려드려요.</p>
+
+      <label for="name">이름 또는 별명</label>
+      <input id="name" maxlength="12" placeholder="예: 소정, 봉사왕" autocomplete="off" />
+
+      <label for="mood">오늘의 기분</label>
+      <select id="mood">
+        <option value="">하나를 선택해주세요</option>
+        <option>설레요</option>
+        <option>평온해요</option>
+        <option>활기차요</option>
+        <option>조금 지쳤어요</option>
+        <option>새로운 일이 기대돼요</option>
+      </select>
+
+      <label for="interest">관심 있는 봉사 분야</label>
+      <select id="interest">
+        <option value="">하나를 선택해주세요</option>
+        <option>환경보호</option>
+        <option>어르신 돌봄</option>
+        <option>아동·청소년</option>
+        <option>재난·안전</option>
+        <option>지역사회 나눔</option>
+      </select>
+
+      <button onclick="makeFortune()">오늘의 봉사운 확인하기 ✨</button>
+      <p class="small">개인정보는 저장되지 않습니다.</p>
+    </section>
+
+    <section class="card" id="result">
+      <div class="badge">TODAY'S VOLUNTEER LUCK</div>
+      <h2 class="result-title" id="resultName"></h2>
+      <p class="result-sub">오늘의 봉사운 결과입니다.</p>
+
+      <div class="score"><span id="score"></span></div>
+
+      <div class="item"><b>🎨 오늘의 행운 컬러</b><span id="color"></span></div>
+      <div class="item"><b>🌱 추천 봉사 분야</b><span id="recommend"></span></div>
+      <div class="item"><b>✅ 오늘의 작은 미션</b><span id="mission"></span></div>
+      <div class="item"><b>🍀 행운 아이템</b><span id="item"></span></div>
+      <div class="message" id="message"></div>
+      <div class="notice">🎁 이 화면을 운영요원에게 보여주세요.</div>
+
+      <button class="again" onclick="resetFortune()">다시 뽑기</button>
+    </section>
+  </main>
+
+  <script>
+    const colors = [
+      "희망과 신뢰를 상징하는 파란색 💙",
+      "활력과 용기를 더하는 주황색 🧡",
+      "따뜻한 나눔을 닮은 노란색 💛",
+      "환경과 성장을 상징하는 초록색 💚",
+      "창의성과 배려를 담은 보라색 💜"
+    ];
+
+    const missions = [
+      "오늘 만나는 사람에게 먼저 밝게 인사하기",
+      "길에 보이는 작은 쓰레기 한 개 줍기",
+      "일회용품 대신 다회용품 한 번 사용하기",
+      "가족이나 친구에게 고마운 마음 전하기",
+      "엘리베이터 문을 뒤 사람을 위해 잡아주기",
+      "사용하지 않는 물건 한 가지를 나눔할 방법 찾아보기",
+      "어르신이나 주변 이웃에게 안부 묻기",
+      "물을 사용할 때 30초만 절약해보기",
+      "온라인에서 따뜻한 응원 댓글 한 줄 남기기",
+      "오늘 하루 누군가의 이야기를 끝까지 들어주기"
+    ];
+
+    const items = [
+      "손수건", "텀블러", "장바구니", "파란색 볼펜", "편안한 운동화",
+      "휴대용 물병", "작은 메모장", "밝은 미소", "좋아하는 음악", "초록색 소품"
+    ];
+
+    const messages = [
+      "당신의 작은 실천은 누군가에게 큰 안심이 될 수 있습니다.",
+      "오늘 건넨 한 번의 친절이 지역사회의 온도를 높입니다.",
+      "완벽한 봉사보다 꾸준한 관심이 더 큰 변화를 만듭니다.",
+      "당신이 먼저 내민 손이 새로운 나눔의 시작이 됩니다.",
+      "세상을 바꾸는 힘은 거창한 행동보다 일상의 작은 선택에서 시작됩니다.",
+      "당신의 따뜻한 마음은 이미 훌륭한 자원봉사의 씨앗입니다."
+    ];
+
+    const recommendations = {
+      "환경보호": ["동네 플로깅", "재활용품 분리배출 캠페인", "업사이클링 활동"],
+      "어르신 돌봄": ["안부전화 봉사", "말벗 활동", "폭염·한파 대비 나눔"],
+      "아동·청소년": ["학습 지원", "진로 멘토링", "놀이·문화 체험 보조"],
+      "재난·안전": ["안전 캠페인", "재난 예방 교육 보조", "생활 안전 점검"],
+      "지역사회 나눔": ["나눔 물품 제작", "지역행사 지원", "취약계층 응원 활동"]
+    };
+
+    function pick(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function makeFortune() {
+      const name = document.getElementById("name").value.trim();
+      const mood = document.getElementById("mood").value;
+      const interest = document.getElementById("interest").value;
+
+      if (!name || !mood || !interest) {
+        alert("이름, 기분, 관심 분야를 모두 선택해주세요.");
+        return;
+      }
+
+      // 같은 입력이어도 행사 재미를 위해 매번 조금씩 다르게 생성
+      const score = Math.floor(Math.random() * 21) + 80;
+      const recList = recommendations[interest] || ["지역사회 나눔 활동"];
+
+      document.getElementById("resultName").textContent = `${name}님의 봉사운`;
+      document.getElementById("score").textContent = `${score}점`;
+      document.getElementById("color").textContent = pick(colors);
+      document.getElementById("recommend").textContent = `${interest} 분야의 ‘${pick(recList)}’`;
+      document.getElementById("mission").textContent = pick(missions);
+      document.getElementById("item").textContent = pick(items);
+      document.getElementById("message").textContent =
+        `${mood}라고 답한 ${name}님께: ${pick(messages)}`;
+
+      document.getElementById("start").style.display = "none";
+      document.getElementById("result").style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function resetFortune() {
+      document.getElementById("result").style.display = "none";
+      document.getElementById("start").style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  </script>
+</body>
+</html>
